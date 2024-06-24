@@ -8,7 +8,7 @@ import random
 
 # Inspired by https://arxiv.org/pdf/2106.01578, but generalized
 # to work on a weighted graph, and this method is also used to solve TSP 
-# in TravelingSalesmanQAOA.py.
+# in TSPQAOA.py.
 
 #Create quantum circuit for QAOA from edges and parmeters
 def QAOA(nQubits,edges,p,betas,gammas):  
@@ -49,7 +49,6 @@ def computeExpectationValue(counts,edges):
 
 #Run the circuit and return counts
 def runCKT(circuit,shots,noise=False):
-    #Had to update this code
     #TODO: Add noise simulation
     simulator = Aer.get_backend('qasm_simulator')
     transpiled = transpile(circuit,backend=simulator)
