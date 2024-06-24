@@ -1,9 +1,11 @@
 from qiskit import *
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from qiskit.circuit.library import DiagonalGate
 from qiskit import transpile
 from qiskit_aer import Aer
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 import random
 
@@ -40,7 +42,29 @@ def QAOA(n,edges,p,betas,gammas):
         for j in edges:
             maxEdgeWeight=max(maxEdgeWeight,j[2])
         penalty=5*maxEdgeWeight
-        #TODO: I have to reflect penalties in the QAOA circuit as well
+        #generate penalty unitary matrices 
+        entries= [0]*(2**n)
+        cur=1
+        while cur<2**n:
+            entries[cur]=1
+            cur*=2
+        # print(entries)
+        for i in range(len(entries)):
+            entries[i]=math.e**(entries[i]*gammas[P]*penalty*1j)
+
+        #being in 2 cities at the same time
+        for t in range(n):
+            excessCity = list(range(t*n,(t+1)*n))
+            circuit.append(DiagonalGate(entries),excessCity)
+
+        #visiting the same city multiple times
+        for i in range(n):
+            excessTime=[]
+            cur=i
+            for j in range(n):
+                excessTime.append(cur)
+                cur+=n
+            circuit.append(DiagonalGate(entries),excessTime)
 
         #mixer hamiltonian
         for q in range(nQubits):
@@ -170,8 +194,8 @@ def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,decay):
             
         #Update the parameters
         for P in range(p):
-            gammas[P] = gammas[P] - a[i]*g_gammas[P]
-            betas[P]  = betas[P]  - a[i]*g_betas[P]
+            gammas[P] = gammas[P] + a[i]*g_gammas[P]
+            betas[P]  = betas[P]  + a[i]*g_betas[P]
         
         #Report progress
         print('Iteration:',i,'Exp(+):',Fplus,'Exp(-):',Fminus)
@@ -181,6 +205,8 @@ def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,decay):
     # plt.ylabel("counts")
     # plt.title("smth idk")
     # plt.show()
+    print(max(zip(counts.values(), counts.keys()))[1])
+    print(min(zip(counts.values(), counts.keys()))[1])
     return max(zip(counts.values(), counts.keys()))[1]
 
 

@@ -128,15 +128,15 @@ def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,decay):
 #4 qubits
 n = 4
 #Edges of the maxcut problem
-edges = [ (0,1,1.0),(0,2,3.0),(0,3,1.0),(1,2,4.0),(1,3,2.0),(2,3,1.0) ]
+edges = [(0,1,0.7),(2,3,5),(3,0,4.5), (2,0,2.2), (0,3,2.5)] 
 #p=2 is sufficient for this problem
-p = 2
+p = 8
 #A sufficient number of optimization iterations to solve problem
-nIterations = 200
+nIterations = 500
 #Typically need quite a few samples (measurements of quantum circuit) per iteration to 
 nSamples = 10000
 #Heuristically chosen a and c
 a_start = 0.25
 c_start = 0.25
-decay = 0.5
+decay = 0.8
 print("Best bitstring:",SPSAforQAOA(n=n,edges=edges,p=p,nIterations=nIterations,nSamples=nSamples,a_start=a_start,c_start=c_start,decay=decay))
