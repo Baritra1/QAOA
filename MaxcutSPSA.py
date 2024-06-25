@@ -10,6 +10,9 @@ import random
 # to work on a weighted graph, and this method is also used to solve TSP 
 # in TSPQAOA.py.
 
+#NOTE: Seems like my SPSA hyperparameters aren't tuned correctly, causing
+#the cost function to not converge to a global maximum.
+
 #Create quantum circuit for QAOA from edges and parmeters
 def QAOA(nQubits,edges,p,betas,gammas):  
     #Define quantum and classical registers
@@ -42,9 +45,10 @@ def computeExpectationValue(counts,edges):
         score = 0  #Score for this bitstring
         for j in range(len(edges)):
             if( bitstring[edges[j][0]] != bitstring[edges[j][1]] ):
-                score = score + edges[j][2]
+                score += edges[j][2]
         totalScore += score * counts[bitstring]  #Multiply score times the # of times it was observed
         totalSamples += counts[bitstring]        #Keep track of the number of measurements (samples)
+    print("Cost: "+str(totalScore))
     return(totalScore/totalSamples)
 
 #Run the circuit and return counts
@@ -64,12 +68,12 @@ def ExpectationValue(circuit,edges,nSamples):
     score = computeExpectationValue(counts,edges)
     return(score)
 
-def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,decay):
+def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,alphaDecay,gammaDecay):
     #Initiate
     a = []; c = [];
     for i in range(1,nIterations+1):
-        a.append( a_start / (i ** decay) )
-        c.append( c_start / (i ** decay) )
+        a.append( a_start / (i ** alphaDecay) )
+        c.append( c_start / (i ** gammaDecay) )
     for i in range(nIterations):
         if( c[i] < 0.01 ):
             c[i] = 0.01
@@ -88,8 +92,8 @@ def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,decay):
         Delta_betas  = []; betas_plus  = []; betas_minus  = [];
         for P in range(p):
             #Generate perturbation vectors of bernoulli variables with magnitude c[i]
-            Delta_gammas.append( random.randrange(2)*2 - 1 * c[i] )
-            Delta_betas.append(  random.randrange(2)*2 - 1 * c[i] )
+            Delta_gammas.append( (random.randrange(2)*2 - 1) * c[i] )
+            Delta_betas.append(  (random.randrange(2)*2 - 1) * c[i] )
             #Create +/- versions of the parameters
             gammas_plus.append( gammas[P] + Delta_gammas[P])
             gammas_minus.append(gammas[P] - Delta_gammas[P])
@@ -108,14 +112,13 @@ def SPSAforQAOA(n,edges,p,nIterations,nSamples,a_start,c_start,decay):
         for P in range(p):
             g_gammas.append( (Fplus - Fminus) / (2*Delta_gammas[P]) )
             g_betas.append(  (Fplus - Fminus) / (2*Delta_betas[P])  )
-            
         #Update the parameters
         for P in range(p):
-            gammas[P] = gammas[P] + a[i]*g_gammas[P]
-            betas[P]  = betas[P]  + a[i]*g_betas[P]
+            gammas[P] = gammas[P] - a[i]*g_gammas[P]
+            betas[P]  = betas[P]  - a[i]*g_betas[P]
         
         #Report progress
-        print('Iteration:',i,'Exp(+):',Fplus,'Exp(-):',Fminus)
+        # print('Iteration:',i,'Exp(+):',Fplus,'Exp(-):',Fminus)
     counts=runCKT(circuit=QAOA(nQubits=n,edges=edges,p=p,betas=betas,gammas=gammas),shots=nSamples)
     plt.bar(list(counts.keys()),list(counts.values()),width=0.9)
     plt.xlabel("bitstrings")
@@ -130,13 +133,14 @@ n = 4
 #Edges of the maxcut problem
 edges = [(0,1,0.7),(2,3,5),(3,0,4.5), (2,0,2.2), (0,3,2.5)] 
 #p=2 is sufficient for this problem
-p = 8
+p = 4
 #A sufficient number of optimization iterations to solve problem
-nIterations = 500
+nIterations = 200
 #Typically need quite a few samples (measurements of quantum circuit) per iteration to 
 nSamples = 10000
 #Heuristically chosen a and c
-a_start = 0.25
-c_start = 0.25
-decay = 0.8
-print("Best bitstring:",SPSAforQAOA(n=n,edges=edges,p=p,nIterations=nIterations,nSamples=nSamples,a_start=a_start,c_start=c_start,decay=decay))
+a_start = 0.1
+c_start = 0.75
+alphaDecay = 0.602
+gammaDecay =0.101
+print("Best bitstring:",SPSAforQAOA(n=n,edges=edges,p=p,nIterations=nIterations,nSamples=nSamples,a_start=a_start,c_start=c_start,alphaDecay=alphaDecay,gammaDecay=gammaDecay))

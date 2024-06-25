@@ -17,7 +17,7 @@ import random
 n=4
 graph= nx.Graph()
 graph.add_nodes_from(np.arange(0,n,1))
-edges=[(0,1,1.0),(0,2,3.0),(0,3,1.0),(1,2,4.0),(1,3,2.0),(2,3,1.0) ]
+edges=[(0,1,0.7),(2,3,5),(3,0,4.5), (2,0,2.2), (0,3,2.5)] 
 graph.add_weighted_edges_from(edges)
 
 #draw original graph

@@ -6,9 +6,8 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Inspired by https://arxiv.org/pdf/2106.01578, but generalized
-# to work on a weighted graph, and this method is also used to solve TSP 
-# in TSPQAOA.py.
+# Uses scipy to optimize rather than SPSA...this works so much more consistently
+#than SPSA.
 
 #Create quantum circuit for QAOA from edges and parmeters
 def QAOA(nQubits,edges,p,betas,gammas):  

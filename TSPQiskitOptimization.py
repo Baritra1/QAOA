@@ -17,8 +17,8 @@ import random
 n=4
 graph= nx.Graph()
 graph.add_nodes_from(np.arange(0,n,1))
-edgeDictionary={(0,1):1.0,(0,2):3.0,(0,3):0.5,(1,2):4.0,(1,3):0.2,(2,3):0.1,(1,0):1.0,(2,0):3.0,(3,0):0.5,(2,1):4.0,(3,1):0.2,(3,2):0.1}
-edgeList = [(0,1,1.0),(0,2,3.0),(1,2,4.0),(0,3,0.5),(1,3,0.2),(2,3,0.1)]
+edgeList = [ (0,1,1.0),(0,2,3.0),(0,3,5.0),(1,2,4.0),(1,3,0.2),(2,3,0.1) ]
+edgeDictionary={(0,1):1.0,(0,2):3.0,(0,3):5.0,(1,2):4.0,(1,3):0.2,(2,3):0.1,(1,0):1.0,(2,0):3.0,(3,0):5.0,(2,1):4.0,(3,1):0.2,(3,2):0.1}
 #TODO: Check if minimum outdegree of all nodes is 2, then there is guaranteed to be a solution, otherwise there is no solution
 #TODO: Automatically add edges to edgeDictionary so that you should only need to have nodes from u->v  and not v->u
 graph.add_weighted_edges_from(edgeList)
@@ -37,7 +37,7 @@ model = Model()
 binary_var=model.binary_var_matrix(range(n),range(n))
 
 #Minimize the sum of the distance from each city from timestep k to k+1
-model.minimize(model.sum(edgeDictionary[(i, j)] * binary_var[(i, k)] * binary_var[(j, (k + 1) % n)] for i in range(n) for j in range(n) for k in range(n)if connected(i,j)))
+model.minimize(model.sum(edgeDictionary[(i, j)] * binary_var[(i, k)] * binary_var[(j, (k + 1) % n)] for i in range(n) for j in range(n) for k in range(n) if i!=j))
 
 for i in range(n):
     model.add_constraint(model.sum(binary_var[(i, k)] for k in range(n)) == 1)
