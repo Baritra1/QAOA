@@ -10,8 +10,8 @@ import random
 # to work on a weighted graph, and this method is also used to solve TSP 
 # in TSPQAOA.py.
 
-#NOTE: Seems like my SPSA hyperparameters aren't tuned correctly, causing
-#the cost function to not converge to a global maximum.
+#NOTE: Very inconsistent. Seems like my SPSA hyperparameters aren't tuned correctly, causing
+#the cost function to not converge to a global maximum. 
 
 #Create quantum circuit for QAOA from edges and parmeters
 def QAOA(nQubits,edges,p,betas,gammas):  

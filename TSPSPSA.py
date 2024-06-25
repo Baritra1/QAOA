@@ -9,7 +9,9 @@ import math
 
 import random
 
-#UNFINISHED
+#NOTE: Very inconsistent. Seems like my SPSA hyperparameters aren't tuned correctly, causing
+#the cost function to not converge to a global maximum. 
+
 def connected(i, j):
     return (i,j) in edgeDictionary
 #Create quantum circuit for QAOA from edges and parmeters

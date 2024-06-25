@@ -10,7 +10,7 @@ import math
 
 import random
 
-#UNFINISHED
+
 def connected(i, j):
     return (i,j) in edgeDictionary
 #Create quantum circuit for QAOA from edges and parmeters
